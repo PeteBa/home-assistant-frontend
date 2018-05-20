@@ -59,7 +59,7 @@ class HaPlantCard extends EventsMixin(PolymerElement) {
     <ha-card class$="[[computeImageClass(stateObj.attributes.entity_picture)]]">
       <div class="banner" style="background-image:url([[stateObj.attributes.entity_picture]])">
         <div class="header">[[computeTitle(stateObj)]]</div>
-	  </div>
+      </div>
       <div class="content">
         <template is="dom-repeat" items="[[computeAttributes(stateObj.attributes)]]">
           <div class="attributes" on-click="attributeClicked">
