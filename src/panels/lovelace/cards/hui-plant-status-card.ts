@@ -62,6 +62,8 @@ class HuiPlantStatusCard extends LitElement implements LovelaceCard {
 
   @internalProperty() private _config?: PlantStatusCardConfig;
 
+  private _backend_config?;
+
   public getCardSize(): number {
     return 3;
   }
@@ -96,6 +98,20 @@ class HuiPlantStatusCard extends LitElement implements LovelaceCard {
     ) {
       applyThemesOnElement(this, this.hass.themes, this._config.theme);
     }
+
+    this.hass.connection
+      .sendMessagePromise({
+        type: "plant/config",
+        entity_id: this._config.entity,
+      })
+      .then(
+        (response) => {
+          this._backend_config = response;
+        },
+        (err) => {
+          console.error("Plant socket request failed!", err);
+        }
+      );
   }
 
   protected render(): TemplateResult {
@@ -262,12 +278,15 @@ class HuiPlantStatusCard extends LitElement implements LovelaceCard {
   }
 
   private _handleMoreInfo(ev: Event): void {
+    if (!this._backend_config) {
+      return;
+    }
+
     const target = ev.currentTarget! as PlantAttributeTarget;
-    const stateObj = this.hass!.states[this._config!.entity];
 
     if (target.value) {
       fireEvent(this, "hass-more-info", {
-        entityId: stateObj.attributes.sensors[target.value],
+        entityId: this._backend_config.sensors[target.value],
       });
     }
   }
